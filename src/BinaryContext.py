@@ -48,7 +48,7 @@ class BinaryContext:
     
 if __name__ == "__main__":
     context = BinaryContext()
-    context.parseData("input/positive.cxt")
+    context.parseData("../input/positive.cxt")
     print "Objects: ", context.objects
     print "Attributes: ", context.attributes
     print "Table: ", context.table
