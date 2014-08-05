@@ -1,4 +1,4 @@
-from src.BinaryJSM import BinaryJSM
+from BinaryJSM import BinaryJSM
                 
 if __name__ == "__main__":
     bjm = BinaryJSM("../input/positive.cxt")
