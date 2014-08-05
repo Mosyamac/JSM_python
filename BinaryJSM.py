@@ -1,18 +1,21 @@
 from BinaryContext import BinaryContext
 
+CLASSLABELS = {1:"positive", 0:"negative", -1:"undefined"}
+
 class BinaryJSM:
     
     positiveCxt, negativeCxt = BinaryContext(), BinaryContext()
+    unknownCxt = BinaryContext()
     positiveHypotheses, negativeHypotheses = [], []
     
     def __init__(self, posCxtFile):
         self.positiveCxt.parseData(posCxtFile)
-        self.negativeCxt.parseData(posCxtFile.replace("positive","negative"))
+        self.negativeCxt.parseData(posCxtFile.replace("positive", "negative"))
         
     def formIntersections(self, cxt):
         intersections = []
         for obj_num1 in xrange(len(cxt.table)):
-            for obj_num2 in xrange(obj_num1+1, len(cxt.table)):
+            for obj_num2 in xrange(obj_num1 + 1, len(cxt.table)):
                 intersections.append(cxt.intersect(obj_num1, obj_num2))
         return intersections
     
@@ -52,6 +55,30 @@ class BinaryJSM:
                 negativeHypotheses.append(intersection)
         self.positiveHypotheses = positiveHypotheses
         self.negativeHypotheses = negativeHypotheses
+    
+    def classify(self, unknownCxtFile):
+        """
+        Classifies  examples with unknown labels from unknownCxtFile
+        If the number of positive hypotheses covered by the description of
+        the example (votingPositiveNum) is equal to the the number of negative
+        hypotheses covered by the description of the example, then the example 
+        is classified as undefined.
+        Otherwise, its label is the result of the voting procedure.
+        """
+        labels = []
+        self.unknownCxt.parseData(unknownCxtFile)
+        positiveCoverage = [[self.intersectionCoversExample(posHyp, testObject)
+                             for posHyp in self.positiveHypotheses] 
+                             for testObject in self.unknownCxt.table]
+        negativeCoverage = [[self.intersectionCoversExample(negHyp, testObject)
+                             for negHyp in self.negativeHypotheses] 
+                             for testObject in self.unknownCxt.table]
+        for i in xrange(len(positiveCoverage)):
+            votingPositiveNum = sum(positiveCoverage[i])
+            votingNegativeNum = sum(negativeCoverage[i])
+            labels.append(-1) if votingPositiveNum == votingNegativeNum  \
+                            else labels.append(int(votingPositiveNum > votingNegativeNum)) 
+        return labels            
         
     def reprHypothesis(self, hypothesis):
         rep = ""
@@ -65,4 +92,8 @@ if __name__ == "__main__":
     fruits.formHypotheses()
     print "Positive hypotheses: ", [fruits.reprHypothesis(hyp) for hyp in fruits.positiveHypotheses]
     print "Negative hypotheses: ", [fruits.reprHypothesis(hyp) for hyp in fruits.negativeHypotheses]
+    classLabels = fruits.classify("input/unknownFruits.cxt")
+    for i in xrange(fruits.unknownCxt.obj_num):
+        print "Example " + fruits.unknownCxt.objects[i] + " is classified as " + \
+        CLASSLABELS[classLabels[i]]
         
