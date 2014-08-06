@@ -1,7 +1,7 @@
 from BinaryJSM import BinaryJSM
                 
 if __name__ == "__main__":
-    bjm = BinaryJSM("../input/positive.cxt")
+    bjm = BinaryJSM("../input/example_positive.cxt")
     posIntersections = bjm.formIntersections(bjm.positiveCxt)
     negIntersections = bjm.formIntersections(bjm.negativeCxt)
     print "Intersection 6 covers object 1 from positive set", bjm.intersectionCoversExample(
